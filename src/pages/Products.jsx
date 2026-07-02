@@ -51,7 +51,7 @@ export default function Products() {
   function addToCart(product) {
     setCart(c => {
       const existing = c.find(i => i.id === product.id)
-      if (existing) return c.map(i => i.id === product.id ? { ...i, qty: i.qty - 1 } : i)
+      if (existing) return c.map(i => i.id === product.id ? { ...i, qty: i.qty + 1 } : i)
       return [...c, { ...product, qty: 1 }]
     })
     flash(`"${product.name}" added to cart.`)
