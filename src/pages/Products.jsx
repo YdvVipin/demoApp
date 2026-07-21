@@ -345,7 +345,7 @@ export default function Products() {
                 <div className="flex justify-between text-sm" data-testid="cart-total-row">
                   <span className="text-slate-500">Total</span>
                   <span className="font-bold text-lg text-slate-800" data-testid="cart-total-value">
-                    ${(cartTotal * (1 - (coupon ? coupon.discountPercent : 0) / 100)).toFixed(2)}
+                    ${(cartTotal * (1 + (coupon ? coupon.discountPercent : 0) / 100)).toFixed(2)}
                   </span>
                 </div>
                 <button data-testid="cart-checkout-btn" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg text-sm transition-colors" onClick={() => { alert('Checkout not available in demo.') }}>
