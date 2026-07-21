@@ -10,6 +10,12 @@ import Orders from './pages/Orders'
 import Analytics from './pages/Analytics'
 import Tasks from './pages/Tasks'
 import Settings from './pages/Settings'
+import Projects from './pages/Projects'
+import ProjectDetail from './pages/ProjectDetail'
+import Tickets from './pages/Tickets'
+import TicketDetail from './pages/TicketDetail'
+import Invoices from './pages/Invoices'
+import Inventory from './pages/Inventory'
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -52,6 +58,12 @@ export default function App() {
             <Route path="orders" element={<Orders />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="tasks" element={<Tasks user={currentUser} />} />
+            <Route path="projects" element={<Projects />} />
+            <Route path="projects/:id" element={<ProjectDetail />} />
+            <Route path="tickets" element={<Tickets />} />
+            <Route path="tickets/:id" element={<TicketDetail />} />
+            <Route path="invoices" element={<Invoices />} />
+            <Route path="inventory" element={<Inventory />} />
             <Route path="settings" element={<Settings user={currentUser} />} />
           </Route>
           <Route path="*" element={<Navigate to={isLoggedIn ? '/dashboard' : '/login'} replace />} />

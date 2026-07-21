@@ -27,6 +27,37 @@ export default function Products() {
   const [editingProduct, setEditingProduct] = useState(null)
   const [form, setForm] = useState(emptyForm)
   const [toastMsg, setToastMsg] = useState('')
+  // Coupon state — validated against the demo API (POST /api/coupon/validate).
+  const [couponCode, setCouponCode] = useState('')
+  const [coupon, setCoupon] = useState(null)      // { code, discountPercent } once applied
+  const [couponError, setCouponError] = useState('')
+  const [couponLoading, setCouponLoading] = useState(false)
+
+  async function applyCoupon() {
+    const code = couponCode.trim()
+    if (!code) return
+    setCouponLoading(true)
+    setCouponError('')
+    try {
+      const res = await fetch('/api/coupon/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      })
+      const data = await res.json()
+      if (data.valid) {
+        setCoupon({ code: data.code, discountPercent: data.discountPercent })
+        setCouponError('')
+      } else {
+        setCoupon(null)
+        setCouponError(`"${code}" is not a valid coupon.`)
+      }
+    } catch {
+      setCouponError('Could not reach the coupon service.')
+    } finally {
+      setCouponLoading(false)
+    }
+  }
 
   function applySort(list) {
     const sorted = [...list]
@@ -281,9 +312,41 @@ export default function Products() {
             {/* Footer */}
             {cart.length > 0 && (
               <div className="border-t border-slate-100 px-5 py-4 space-y-3" data-testid="cart-footer">
+                {/* Coupon — validated against the demo API */}
+                <div className="space-y-1" data-testid="cart-coupon">
+                  <div className="flex gap-2">
+                    <input
+                      data-testid="cart-coupon-input"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') applyCoupon() }}
+                      placeholder="Coupon code (try SAVE10)"
+                      className="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                    />
+                    <button
+                      data-testid="cart-coupon-apply"
+                      onClick={applyCoupon}
+                      disabled={couponLoading}
+                      className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      {couponLoading ? '…' : 'Apply'}
+                    </button>
+                  </div>
+                  {couponError && (
+                    <p data-testid="cart-coupon-error" className="text-xs text-red-600">{couponError}</p>
+                  )}
+                  {coupon && (
+                    <p data-testid="cart-coupon-applied" className="text-xs text-green-600">
+                      {coupon.code} applied — {coupon.discountPercent}% off
+                    </p>
+                  )}
+                </div>
+
                 <div className="flex justify-between text-sm" data-testid="cart-total-row">
                   <span className="text-slate-500">Total</span>
-                  <span className="font-bold text-lg text-slate-800" data-testid="cart-total-value">${cartTotal.toFixed(2)}</span>
+                  <span className="font-bold text-lg text-slate-800" data-testid="cart-total-value">
+                    ${(cartTotal * (1 - (coupon ? coupon.discountPercent : 0) / 100)).toFixed(2)}
+                  </span>
                 </div>
                 <button data-testid="cart-checkout-btn" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg text-sm transition-colors" onClick={() => { alert('Checkout not available in demo.') }}>
                   Proceed to Checkout
